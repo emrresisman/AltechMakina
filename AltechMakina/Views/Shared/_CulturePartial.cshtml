@@ -1,0 +1,62 @@
+﻿@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Options
+@inject IViewLocalizer Localizer
+@inject IOptions<RequestLocalizationOptions> LocOptions
+@{
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var cultureItems = LocOptions.Value.SupportedUICultures
+      .Select(c => new SelectListItem { Value = c.Name, Text = Localizer.GetString(c.Name) })
+        .ToList();
+
+    var returnUrl = string.IsNullOrEmpty(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}{Context.Request.QueryString}";
+}
+<div title="@Localizer["Request culture provider:"] @requestCulture?.Provider?.GetType().Name">
+    <form id="selectLanguage"
+          asp-controller="Culture"
+          asp-action="SetCulture"
+          asp-route-returnUrl="@returnUrl"
+          method="post"
+          class="top-links-item"
+          role="form">
+        <select style="border:none;" class="custom-sel" name="culture"
+                onchange="this.form.submit();"
+                asp-for="@requestCulture.RequestCulture.UICulture.Name"
+                asp-items="cultureItems">
+        </select>
+    </form>
+</div>
+
+
+@*<li class="top-links-item">
+    <a href="#">@Localizer["Request culture provider:"] @requestCulture?.Provider?.GetType().Name"<i class="icon-angle-down"></i></a>
+    <ul class="top-links-sub-menu">
+        <li class="top-links-item"><a href="#"><img src="images/icons/flags/french.png" alt="French"> FR</a></li>
+        <li class="top-links-item"><a href="#"><img src="images/icons/flags/italian.png" alt="Italian"> IT</a></li>
+        <li class="top-links-item"><a href="#"><img src="images/icons/flags/german.png" alt="German"> DE</a></li>
+    </ul>
+</li>*@
+<style>
+  select {
+  /* Hide the default dropdown arrow */
+  appearance: none;
+  /* Add a custom arrow icon */
+  background: url("arrow.png") no-repeat right #fff;
+  background-size: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #444;
+  font-size: 16px;
+  padding: 10px;
+  /* Add some space for the arrow icon */
+  padding-right: 30px;
+  width: 100%;
+
+  /* Style the appearance of the options */
+  option {
+    color: #000;
+  }
+}
+</style>
